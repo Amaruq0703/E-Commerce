@@ -3,8 +3,26 @@ from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
+from django import forms
 
-from .models import User
+from .models import *
+
+
+class NewListingForm(forms.Form):
+    listing_name = forms.CharField(widget=forms.TextInput(attrs={
+            'placeholder' : 'Enter Product Name'
+        }), label='')
+    
+    listing_description = forms.CharField(widget=forms.Textarea(attrs={
+        'placeholder': 'Enter Product Description'
+    }), label="")
+
+    listing_starting = forms.IntegerField(widget=forms.NumberInput(attrs={
+        'placeholder': 'Enter Starting Price'
+    }), label="")
+
+    listing_photo = forms.ImageField(required=False,)
+
 
 
 def index(request):
@@ -61,3 +79,21 @@ def register(request):
         return HttpResponseRedirect(reverse("index"))
     else:
         return render(request, "auctions/register.html")
+    
+def make_listing(request, username):
+    listingform = NewListingForm()
+    
+    if request.method == 'POST':
+        listing_name = request.POST.get('listing_name')
+        listing_description = request.POST.get('listing_description')
+        listing_starting = request.POST.get('listing_starting')
+        listing_photo = request.POST.get('listing_photo')
+        listing_maker = User.objects.get(username=username)
+
+        auction_listing = AuctionListings(listing_name=listing_name, listing_description=listing_description, listing_starting=listing_starting, listing_photo=listing_photo, listing_maker=listing_maker)
+        auction_listing.save()
+        return HttpResponseRedirect(reverse('index'))
+    else:
+        return render(request, 'auctions/makelisting.html', {
+            'listingform' : listingform,
+        })
