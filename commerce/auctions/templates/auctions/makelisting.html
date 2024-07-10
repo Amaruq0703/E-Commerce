@@ -6,8 +6,6 @@
         <form action="{% url 'makelisting' user.username%}" method="post">
             {% csrf_token %}
             {{ listingform }}
-            <input type="submit" name="submitbutton">
+            <input type="submit" name="submitbutton" class="btn btn-primary mb-2">
         </form>
-
-
 {% endblock %}
