@@ -31,21 +31,19 @@ class NewListingForm(forms.Form):
         'placeholder': 'Enter Image URL',
         'required' : 'True',
         'class': 'form-control'
-    }), label="Photo URL", required=False)
+    }), label="Photo", required=False)
 
     listing_category = forms.ChoiceField(choices=AuctionListings.CATEGORY, widget=forms.Select(attrs={
         'placeholder': 'Choose Category',
         'required' : 'True',
         'class': 'form-control'
-    }), label="Category", required=False)
+    }), label="", required=False)
 
 
 
-def index(request):
-    listing_maker = User.objects.get(pk=request.user.id)
+def index(request):        
     return render(request, "auctions/index.html", {
         'listings' : AuctionListings.objects.all(),
-        'listing_maker' : listing_maker.username
     })
 
 
