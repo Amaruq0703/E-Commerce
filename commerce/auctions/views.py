@@ -10,23 +10,43 @@ from .models import *
 
 class NewListingForm(forms.Form):
     listing_name = forms.CharField(widget=forms.TextInput(attrs={
-            'placeholder' : 'Enter Product Name'
-        }), label='')
+            'placeholder' : 'Enter Product Name',
+            'required' : 'True', 
+            'class': 'form-control'
+        }), label='Listing Name', required=False)
     
     listing_description = forms.CharField(widget=forms.Textarea(attrs={
-        'placeholder': 'Enter Product Description'
-    }), label="")
+        'placeholder': 'Enter Product Description',
+        'required' : 'True',
+        'class': 'form-control'
+    }), label="Description", required=False)
 
     listing_starting = forms.IntegerField(widget=forms.NumberInput(attrs={
-        'placeholder': 'Enter Starting Price'
-    }), label="")
+        'placeholder': 'Enter Starting Price',
+        'required' : 'True',
+        'class': 'form-control'
+    }), label="Starting Price", required=False)
 
-    listing_photo = forms.ImageField(required=False,)
+    listing_photo = forms.URLField(widget=forms.URLInput(attrs={
+        'placeholder': 'Enter Image URL',
+        'required' : 'True',
+        'class': 'form-control'
+    }), label="Photo URL", required=False)
+
+    listing_category = forms.ChoiceField(choices=AuctionListings.CATEGORY, widget=forms.Select(attrs={
+        'placeholder': 'Choose Category',
+        'required' : 'True',
+        'class': 'form-control'
+    }), label="Category", required=False)
 
 
 
 def index(request):
-    return render(request, "auctions/index.html")
+    listing_maker = User.objects.get(pk=request.user.id)
+    return render(request, "auctions/index.html", {
+        'listings' : AuctionListings.objects.all(),
+        'listing_maker' : listing_maker.username
+    })
 
 
 def login_view(request):
@@ -81,14 +101,14 @@ def register(request):
         return render(request, "auctions/register.html")
     
 def make_listing(request, username):
-    listingform = NewListingForm()
+    listingform = NewListingForm(request.POST, request.FILES)
     
     if request.method == 'POST':
         listing_name = request.POST.get('listing_name')
         listing_description = request.POST.get('listing_description')
         listing_starting = request.POST.get('listing_starting')
         listing_photo = request.POST.get('listing_photo')
-        listing_maker = User.objects.get(username=username)
+        listing_maker = User.objects.get(pk=request.user.id)
 
         auction_listing = AuctionListings(listing_name=listing_name, listing_description=listing_description, listing_starting=listing_starting, listing_photo=listing_photo, listing_maker=listing_maker)
         auction_listing.save()
