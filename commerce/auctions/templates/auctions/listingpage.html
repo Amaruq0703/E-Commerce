@@ -1,0 +1,32 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-8 border-right">
+                <p class="h1">{{listing.listing_name}}</p>
+                <img src="{{listing.listing_photo}}" alt="{{listing.listing_name}} photo">
+                <p class="h4">{{listing.listing_description}}</p>
+                <p class="h4">Starting Price: {{listing.listing_starting}}$</p>
+                <p class="h6">Listed by: {{listing.listing_maker}}</p>
+                <a href="{% url 'viewlisting' auction_id=listing.id %}" class="btn btn-primary">Bid</a>
+            </div>
+            <div class="col-4">
+                <h2>Comments</h2>
+                    {% if comments %}
+                        {% for comment in comments %}
+                            <strong>{{comment.comment_maker.username}}</strong>
+                            <p>{{comment.comment_text}}</p>
+                        {% endfor %}
+                    {% else %}
+                        <strong>No Comments</strong>
+                    {% endif %}
+                    <form action="{% url 'viewlisting' auction_id=listing.id%}" method="post">
+                        {% csrf_token %}
+                        {{ commentform }}
+                        <input type="submit" class="btn btn-primary">
+                    </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}
