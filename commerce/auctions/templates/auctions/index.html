@@ -12,9 +12,10 @@
                         <div class="card-body d-flex flex-column">
                         <h5 class="card-title">{{listing.listing_name}}</h5>
                         <p class="card-text">{{listing.listing_description}}</p>
+                        <p class="card-text">Category: {{listing.listing_category}}</p>
                         <div class="mt-auto">
                             <p class="card-text">Starting Price: {{listing.listing_starting}}$</p>
-                            <a href="listingpage.html" class="btn btn-lg btn-block btn-primary">View Listing</a>
+                            <a href="{% url 'viewlisting' auction_id=listing.id %}" class="btn btn-lg btn-block btn-primary">View Listing</a>
                         </div>
                         </div>
                         <div class="card-footer">

@@ -4,3 +4,4 @@ from auctions.models import *
 
 admin.site.register(AuctionListings)
 admin.site.register(User)
+admin.site.register(Comment)

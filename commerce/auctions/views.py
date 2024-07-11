@@ -39,7 +39,12 @@ class NewListingForm(forms.Form):
         'class': 'form-control'
     }), label="", required=False)
 
-
+class CommentForm(forms.Form):
+    comment_text = forms.CharField(widget=forms.Textarea(attrs={
+        'placeholder' : 'Comment on this Listing...',
+        'required' : 'True',
+        'class' : 'form-control'
+    }), label="")
 
 def index(request):        
     return render(request, "auctions/index.html", {
@@ -98,7 +103,7 @@ def register(request):
     else:
         return render(request, "auctions/register.html")
     
-def make_listing(request, username):
+def make_listing(request):
     listingform = NewListingForm(request.POST, request.FILES)
     
     if request.method == 'POST':
@@ -107,11 +112,32 @@ def make_listing(request, username):
         listing_starting = request.POST.get('listing_starting')
         listing_photo = request.POST.get('listing_photo')
         listing_maker = User.objects.get(pk=request.user.id)
+        listing_category = request.POST.get('listing_category')
 
-        auction_listing = AuctionListings(listing_name=listing_name, listing_description=listing_description, listing_starting=listing_starting, listing_photo=listing_photo, listing_maker=listing_maker)
+        auction_listing = AuctionListings(listing_name=listing_name, listing_description=listing_description, listing_starting=listing_starting, listing_photo=listing_photo, listing_maker=listing_maker, listing_category=listing_category)
         auction_listing.save()
         return HttpResponseRedirect(reverse('index'))
     else:
         return render(request, 'auctions/makelisting.html', {
             'listingform' : listingform,
         })
+    
+def viewlisting(request, auction_id):
+    listing = AuctionListings.objects.get(pk = auction_id)
+    comments = Comment.objects.filter(comment_auction = listing)
+    commentform = CommentForm()
+
+    if request.method == 'POST':
+        comment_text = request.POST.get('comment_text')
+        comment_auction = listing
+        comment_maker = User.objects.get(pk=request.user.id)
+
+        comment = Comment(comment_text=comment_text, comment_auction=comment_auction, comment_maker=comment_maker)
+        comment.save()
+        return HttpResponseRedirect(reverse('viewlisting', kwargs={'auction_id' : listing.id,}))
+    
+    return render(request, 'auctions/listingpage.html', {
+        'listing' : listing,
+        'comments' : comments,
+        'commentform' : commentform
+    })

@@ -33,3 +33,8 @@ class AuctionListings(models.Model):
     listing_maker = models.ForeignKey(User, on_delete=models.CASCADE, related_name='listings_made')
     listing_category = models.CharField(max_length=3, choices=CATEGORY)
 
+class Comment(models.Model):
+    comment_text = models.CharField(max_length=400)
+    comment_maker = models.ForeignKey(User, on_delete=models.CASCADE, related_name='comments_made')
+    comment_auction = models.ForeignKey(AuctionListings, on_delete=models.CASCADE, related_name='comments_on')
+
