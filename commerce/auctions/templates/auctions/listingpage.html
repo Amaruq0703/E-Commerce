@@ -10,6 +10,11 @@
                 <p class="h4">Starting Price: {{listing.listing_starting}}$</p>
                 <p class="h6">Listed by: {{listing.listing_maker}}</p>
                 <a href="{% url 'viewlisting' auction_id=listing.id %}" class="btn btn-primary">Bid</a>
+                {% if watchlist_bool %}
+                    <a href="{% url 'watchlist' auction_id=listing.id %}" class="btn btn-primary">Remove From Watchlist</a>
+                {% else %}
+                    <a href="{% url 'watchlist' auction_id=listing.id %}" class="btn btn-primary">Add To Watchlist</a>
+                {% endif %}
             </div>
             <div class="col-4">
                 <h2>Comments</h2>

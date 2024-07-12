@@ -126,6 +126,9 @@ def viewlisting(request, auction_id):
     listing = AuctionListings.objects.get(pk = auction_id)
     comments = Comment.objects.filter(comment_auction = listing)
     commentform = CommentForm()
+    watchlist_items = Watchlist.objects.filter(watchlist_listing = listing)
+    watchlist_user = User.objects.get(pk=request.user.id)
+    watchlist_bool = Watchlist.objects.filter(watchlist_listing = listing, watchlist_maker = watchlist_user)
 
     if request.method == 'POST':
         comment_text = request.POST.get('comment_text')
@@ -139,5 +142,29 @@ def viewlisting(request, auction_id):
     return render(request, 'auctions/listingpage.html', {
         'listing' : listing,
         'comments' : comments,
-        'commentform' : commentform
+        'commentform' : commentform,
+        'watchlist_items' : watchlist_items,
+        'watchlist_bool' : watchlist_bool
     })
+
+def watchlist(request, auction_id):
+    listing = AuctionListings.objects.get(pk = auction_id)
+    watchlist_user = User.objects.get(pk=request.user.id)
+    watchlist_bool = Watchlist.objects.filter(watchlist_listing = listing, watchlist_maker = watchlist_user)
+    if watchlist_bool:
+        watchlist_bool.delete()
+    else:
+        w = Watchlist(watchlist_listing = listing, watchlist_maker = watchlist_user)
+        w.save()
+
+    return HttpResponseRedirect(reverse('viewlisting', kwargs={'auction_id' : listing.id, }))
+        
+
+def watchlist_page(request, username):
+    user = User.objects.get(pk=request.user.id)
+    watchlist_items = user.watchlist_items.all()
+    return render(request, 'auctions/watchlist_page.html', {
+        'watchlist_items' : watchlist_items
+    })
+    
+
