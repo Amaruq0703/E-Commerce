@@ -38,3 +38,7 @@ class Comment(models.Model):
     comment_maker = models.ForeignKey(User, on_delete=models.CASCADE, related_name='comments_made')
     comment_auction = models.ForeignKey(AuctionListings, on_delete=models.CASCADE, related_name='comments_on')
 
+class Watchlist(models.Model):
+    watchlist_listing = models.ForeignKey(AuctionListings, on_delete=models.CASCADE, related_name='in_watchlists')
+    watchlist_maker = models.ForeignKey(User, on_delete=models.CASCADE, related_name='watchlist_items')
+
