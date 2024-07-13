@@ -28,7 +28,7 @@ class AuctionListings(models.Model):
     
     listing_name = models.CharField(max_length=64)
     listing_description = models.CharField(max_length=128)
-    listing_photo = models.URLField(blank=True)
+    listing_photo = models.URLField(blank=True, max_length=4000)
     listing_starting = models.IntegerField()
     listing_maker = models.ForeignKey(User, on_delete=models.CASCADE, related_name='listings_made')
     listing_category = models.CharField(max_length=3, choices=CATEGORY)
