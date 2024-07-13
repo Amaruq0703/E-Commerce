@@ -213,3 +213,19 @@ def closelisting(request, auction_id):
         'winner' : winner
     })
 
+def viewcategories(request):
+
+    categories = AuctionListings.CATEGORY
+
+    return render(request, 'auctions/categories.html', {
+        'categories' : categories
+    })
+
+def category(request, category_name):
+    listings = AuctionListings.objects.filter(listing_category = category_name)
+
+    return render(request, 'auctions/categorypage.html', {
+        'listings' : listings,
+        'category_name' : category_name
+    })
+
