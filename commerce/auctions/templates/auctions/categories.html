@@ -1,0 +1,16 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+    <h1>Categories</h1>
+    <a href="{% url 'category_page' category_name='VEH'%}">Vehicles</a><br>
+    <a href="{% url 'category_page' category_name='FAS'%}">Fashion</a><br>
+    <a href="{% url 'category_page' category_name='DEV'%}">Devices</a><br>
+    <a href="{% url 'category_page' category_name='TOO'%}">Tools</a><br>
+    <a href="{% url 'category_page' category_name='SPO'%}">Sports</a><br>
+    <a href="{% url 'category_page' category_name='TOY'%}">Toys</a><br>
+    <a href="{% url 'category_page' category_name='ENT'%}">Entertainment</a><br>
+    <a href="{% url 'category_page' category_name='MIS'%}">Miscellanious</a>
+    
+{% endblock %}
+
+
