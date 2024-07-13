@@ -46,6 +46,13 @@ class CommentForm(forms.Form):
         'class' : 'form-control'
     }), label="")
 
+class BidForm(forms.Form):
+    bid_amount = forms.IntegerField(widget=forms.NumberInput(attrs={
+        'placeholder' : 'Bid on this Listing...',
+        'required' : 'True',
+        'class' : 'form-control'
+    }), label="", required=False)
+
 def index(request):        
     return render(request, "auctions/index.html", {
         'listings' : AuctionListings.objects.all(),
@@ -114,7 +121,7 @@ def make_listing(request):
         listing_maker = User.objects.get(pk=request.user.id)
         listing_category = request.POST.get('listing_category')
 
-        auction_listing = AuctionListings(listing_name=listing_name, listing_description=listing_description, listing_starting=listing_starting, listing_photo=listing_photo, listing_maker=listing_maker, listing_category=listing_category)
+        auction_listing = AuctionListings(listing_name=listing_name, listing_description=listing_description, listing_starting=listing_starting, listing_photo=listing_photo, listing_maker=listing_maker, listing_category=listing_category, listing_status = True)
         auction_listing.save()
         return HttpResponseRedirect(reverse('index'))
     else:
@@ -129,6 +136,8 @@ def viewlisting(request, auction_id):
     watchlist_items = Watchlist.objects.filter(watchlist_listing = listing)
     watchlist_user = User.objects.get(pk=request.user.id)
     watchlist_bool = Watchlist.objects.filter(watchlist_listing = listing, watchlist_maker = watchlist_user)
+    bids = listing.bids.all()
+    winner_bid = bids.order_by('-bid_amount').first()
 
     if request.method == 'POST':
         comment_text = request.POST.get('comment_text')
@@ -144,7 +153,10 @@ def viewlisting(request, auction_id):
         'comments' : comments,
         'commentform' : commentform,
         'watchlist_items' : watchlist_items,
-        'watchlist_bool' : watchlist_bool
+        'watchlist_bool' : watchlist_bool,
+        'bids' : bids,
+        'user' : watchlist_user,
+        'winner_bid' : winner_bid
     })
 
 def watchlist(request, auction_id):
@@ -166,5 +178,38 @@ def watchlist_page(request, username):
     return render(request, 'auctions/watchlist_page.html', {
         'watchlist_items' : watchlist_items
     })
+
+def bid(request, auction_id):
+    item = AuctionListings.objects.get(pk=auction_id)
+    bidform = BidForm(request.POST)
+    if request.method == 'POST':  
+        if bidform.is_valid():
+            bid_amount = bidform.cleaned_data['bid_amount']
+            user = User.objects.get(pk=request.user.id) 
+            bid = Bid(bid_maker = user, bid_item = item, bid_amount=bid_amount)
+            try:
+                bid.save()
+                return HttpResponseRedirect(reverse('viewlisting', kwargs={'auction_id' : auction_id, }))
+            except ValidationError as e:
+                bidform.add_error('bid_amount', e.message)
+            
     
+    return render(request, 'auctions/bidpage.html', {
+        'bidform' : bidform,
+        'auction_id': auction_id,
+        'item' : item
+    })
+    
+def closelisting(request, auction_id):
+
+    listing = AuctionListings.objects.get(pk=auction_id)
+    bids = listing.bids.all()
+    winner_bid = bids.order_by('-bid_amount').first()
+    winner = winner_bid.bid_maker.username
+    listing.listing_status=False
+    listing.save()
+
+    return render(request, 'auctions/closelisting.html', {
+        'winner' : winner
+    })
 

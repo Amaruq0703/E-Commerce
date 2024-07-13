@@ -1,0 +1,32 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+    <h2>Make a Bid on {{ item.listing_name }}</h2>
+    <img src="{{item.listing_photo}}" alt="{{item.listing_name}} photo" style="width: 200px;">
+    <form action="{% url 'bid' auction_id=auction_id %}" method="post">
+        {% csrf_token %}
+        <div class="form-group">
+
+            {% if bidform.non_field_errors %}
+                <div class="alert alert-danger">
+                    {{ bidform.non_field_errors }}
+                </div>
+            {% endif %}
+
+            {% for field in bidform %}
+                <div class="form-group">
+                    {{ field.label_tag }}
+                    {{ field }}
+                    {% if field.errors %}
+                        <div class="alert alert-danger">
+                            {{ field.errors }}
+                        </div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+        
+        <input type="submit" name="submitbutton" class="btn btn-primary mb-2">
+    </form>
+{% endblock %}
+
