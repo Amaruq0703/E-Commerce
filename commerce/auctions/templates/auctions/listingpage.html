@@ -1,37 +1,57 @@
 {% extends "auctions/layout.html" %}
 
 {% block body %}
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-8 border-right">
-                <p class="h1">{{listing.listing_name}}</p>
-                <img src="{{listing.listing_photo}}" alt="{{listing.listing_name}} photo">
-                <p class="h4">{{listing.listing_description}}</p>
-                <p class="h4">Starting Price: {{listing.listing_starting}}$</p>
-                <p class="h6">Listed by: {{listing.listing_maker}}</p>
-                <a href="{% url 'viewlisting' auction_id=listing.id %}" class="btn btn-primary">Bid</a>
-                {% if watchlist_bool %}
-                    <a href="{% url 'watchlist' auction_id=listing.id %}" class="btn btn-primary">Remove From Watchlist</a>
-                {% else %}
-                    <a href="{% url 'watchlist' auction_id=listing.id %}" class="btn btn-primary">Add To Watchlist</a>
-                {% endif %}
-            </div>
-            <div class="col-4">
-                <h2>Comments</h2>
-                    {% if comments %}
-                        {% for comment in comments %}
-                            <strong>{{comment.comment_maker.username}}</strong>
-                            <p>{{comment.comment_text}}</p>
-                        {% endfor %}
-                    {% else %}
-                        <strong>No Comments</strong>
-                    {% endif %}
-                    <form action="{% url 'viewlisting' auction_id=listing.id%}" method="post">
-                        {% csrf_token %}
-                        {{ commentform }}
-                        <input type="submit" class="btn btn-primary">
-                    </form>
+    {% if listing.listing_status == True%}
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-8 border-right">
+                    <div class="border-bottom pb-2">
+                        <p class="h1">{{listing.listing_name}}</p>
+                        <img src="{{listing.listing_photo}}" alt="{{listing.listing_name}} photo">
+                        <p class="h4">{{listing.listing_description}}</p>
+                        <p class="h4">Starting Price: {{listing.listing_starting}}$</p>
+                        <p class="h6">Listed by: {{listing.listing_maker}}</p>
+                        <a href="{% url 'bid' auction_id=listing.id %}" class="btn btn-primary">Bid</a>
+                        {% if watchlist_bool %}
+                            <a href="{% url 'watchlist' auction_id=listing.id %}" class="btn btn-primary">Remove From Watchlist</a>
+                        {% else %}
+                            <a href="{% url 'watchlist' auction_id=listing.id %}" class="btn btn-primary">Add To Watchlist</a>
+                        {% endif %}
+                        {% if user.username == listing.listing_maker.username %}
+                            <a href="{% url 'closelisting' auction_id=listing.id %}" class="btn btn-primary">Close Listing</a>
+                        {% endif %}
+                    </div>
+                    <div>
+                        <p class="h2">Bids</p>
+                        {% if bids %}
+                            {% for bid in bids %}
+                                <strong>{{bid.bid_maker.username}}:</strong>
+                                <p>{{bid.bid_amount}}</p>
+                            {% endfor %}
+                        {% else %}
+                            <strong>No Bids</strong>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="col-4">
+                    <h2>Comments</h2>
+                        {% if comments %}
+                            {% for comment in comments %}
+                                <strong>{{comment.comment_maker.username}}</strong>
+                                <p>{{comment.comment_text}}</p>
+                            {% endfor %}
+                        {% else %}
+                            <strong>No Comments</strong>
+                        {% endif %}
+                        <form action="{% url 'viewlisting' auction_id=listing.id%}" method="post">
+                            {% csrf_token %}
+                            {{ commentform }}
+                            <input type="submit" class="btn btn-primary">
+                        </form>
+                </div>
             </div>
         </div>
-    </div>
+    {% else %}
+    <p class="h1">Listing is closed, {{winner_bid.bid_maker.username}} is the winner</p>
+    {% endif %}
 {% endblock %}
